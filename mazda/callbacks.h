@@ -145,6 +145,7 @@ public:
     virtual void CustomizeOutputChannel(int chan, HU::ChannelDescriptor::OutputStreamChannel& streamChannel) override;
     virtual void AudioFocusRequest(int chan, const HU::AudioFocusRequest& request) override;
     virtual void VideoFocusRequest(int chan, const HU::VideoFocusRequest& request) override;
+    virtual void CustomizeCarInfo(HU::ServiceDiscoveryResponse& carInfo) override;
 
     virtual std::string GetCarBluetoothAddress() override;
 

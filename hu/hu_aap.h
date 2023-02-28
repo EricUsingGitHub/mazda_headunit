@@ -4,6 +4,7 @@
 #include "hu_ssl.h"
 #include <functional>
 #include <thread>
+#include <array>
 
 // Channels ( or Service IDs)
 #define AA_CH_CTR 0                                                                                  // Sync with hu_tra.java, hu_aap.h and hu_aap.c:aa_type_array[]
@@ -201,8 +202,8 @@ protected:
   HU_STATE iaap_state = hu_STATE_INITIAL;
   int iaap_tra_recv_tmo = 150;//100;//1;//10;//100;//250;//100;//250;//100;//25; // 10 doesn't work ? 100 does
   int iaap_tra_send_tmo = 500;//2;//25;//250;//500;//100;//500;//250;
-  std::vector<uint8_t>* temp_assembly_buffer = new std::vector<uint8_t>();
-  std::map<int, std::vector<uint8_t>*> channel_assembly_buffers;
+  std::vector<uint8_t> temp_assembly_buffer_out;
+  std::array<std::vector<uint8_t>, AA_CH_MAX> channel_assembly_buffers;
   byte enc_buf[MAX_FRAME_SIZE] = {0};
   int32_t channel_session_id[AA_CH_MAX] = {0};
 

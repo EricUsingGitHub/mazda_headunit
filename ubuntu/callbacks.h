@@ -6,7 +6,7 @@
 #include "audio.h"
 #include "command_server.h"
 
-#include <asoundlib.h>
+#include <alsa/asoundlib.h>
 #include "version.h"
 
 class VideoOutput;
@@ -34,6 +34,7 @@ public:
         virtual void CustomizeOutputChannel(int chan, HU::ChannelDescriptor::OutputStreamChannel& streamChannel) override;
         virtual void AudioFocusRequest(int chan, const HU::AudioFocusRequest& request) override;
         virtual void VideoFocusRequest(int chan, const HU::VideoFocusRequest& request) override;
+        virtual void CustomizeCarInfo(HU::ServiceDiscoveryResponse& carInfo) override;
 
         virtual void HandlePhoneStatus(IHUConnectionThreadInterface& stream, const HU::PhoneStatus& phoneStatus) override;
         //Doesn't actually work yet

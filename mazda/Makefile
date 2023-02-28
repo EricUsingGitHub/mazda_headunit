@@ -9,15 +9,16 @@ LIBUNWIND=./libunwind-1.2-rc1
 CC=$(M3TOOLCHAIN)/bin/arm-cortexa9_neon-linux-gnueabi-gcc
 CXX=$(M3TOOLCHAIN)/bin/arm-cortexa9_neon-linux-gnueabi-g++
 LD=$(M3TOOLCHAIN)/bin/arm-cortexa9_neon-linux-gnueabi-ld
+STRIP=$(M3TOOLCHAIN)/bin/arm-cortexa9_neon-linux-gnueabi-strip
 SYSROOT=$(M3TOOLCHAIN)/arm-cortexa9_neon-linux-gnueabi/sysroot
 
 INCLUDES=$(shell ./pkg-config-wrapper $(SYSROOT) --cflags gstreamer-0.10 gstreamer-app-0.10 gstreamer-video-0.10 dbus-1 libusb-1.0  libcrypto openssl glib-2.0 dbus-c++-1 dbus-c++-glib-1 libudev alsa) -I$(TOP)/hu -I$(TOP)/common -I$(TOP)/hu/generated.arm  -I$(PROTOTOOLCHAIN)/include -I$(LIBUNWIND)/include
 
-CFLAGS=-O3 -g -rdynamic -pthread --sysroot=$(SYSROOT) -DCMU=1 -D__STDC_FORMAT_MACROS -march=armv7-a -mtune=cortex-a9 -mfpu=neon
+CFLAGS=-O3 -rdynamic -pthread --sysroot=$(SYSROOT) -DCMU=1 -D__STDC_FORMAT_MACROS -march=armv7-a -mtune=cortex-a9 -mfpu=neon
 CXXFLAGS=$(CFLAGS) -std=c++11 -static-libstdc++ -D_GLIBCXX_USE_C99
 
 #static link  dbus-c++-glib-1 since it's not on the car
-LFLAGS= --sysroot=$(SYSROOT) -g -rdynamic -pthread -ldl -static-libstdc++ $(shell ./pkg-config-wrapper $(SYSROOT) --libs gstreamer-0.10 gstreamer-app-0.10 gstreamer-video-0.10 dbus-1 libusb-1.0 libcrypto openssl glib-2.0 dbus-c++-1 libudev alsa) -l:libdbus-c++-glib-1.a -L$(PROTOTOOLCHAIN)/lib -lprotobuf -L$(LIBUNWIND)/lib -lunwind
+LFLAGS= --sysroot=$(SYSROOT) -rdynamic -pthread -ldl -static-libstdc++ $(shell ./pkg-config-wrapper $(SYSROOT) --libs gstreamer-0.10 gstreamer-app-0.10 gstreamer-video-0.10 dbus-1 libusb-1.0 libcrypto openssl glib-2.0 dbus-c++-1 libudev alsa) -l:libdbus-c++-glib-1.a -L$(PROTOTOOLCHAIN)/lib -lprotobuf -L$(LIBUNWIND)/lib -lunwind
 
 #headunit binary
 SRCS = $(TOP)/hu/hu_aad.cpp
@@ -83,6 +84,8 @@ clean:
 
 install: all
 	cp -a -f headunit installer/config/androidauto/data_persist/dev/bin/; cp -a -f headunit.json installer/config/androidauto/data_persist/dev/bin/
+	$(STRIP) -g --strip-unneeded installer/config/androidauto/data_persist/dev/bin/headunit
+
 release: install
 	zip -r -FS $(APPLICATION_NAME)_$(APPLICATION_VERSION).zip installer/
 

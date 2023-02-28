@@ -89,6 +89,11 @@ void DesktopEventCallbacks::VideoFocusRequest(int chan, const HU::VideoFocusRequ
     VideoFocusHappened(request.mode() == HU::VIDEO_FOCUS_MODE_FOCUSED, VIDEO_FOCUS_REQUESTOR::ANDROID_AUTO);
 }
 
+void DesktopEventCallbacks::CustomizeCarInfo(HU::ServiceDiscoveryResponse &carInfo)
+{
+    carInfo.set_driver_pos(config::rightHandDrive);
+}
+
 std::string DesktopEventCallbacks::GetCarBluetoothAddress()
 {
     return get_bluetooth_mac_address();
@@ -204,7 +209,7 @@ void DesktopEventCallbacks::HandleNaviStatus(IHUConnectionThreadInterface& strea
 void DesktopEventCallbacks::HandleNaviTurn(IHUConnectionThreadInterface& stream, const HU::NAVTurnMessage &request){
     const char *event_name = &request.event_name()[0];
     std::string image = request.image();
-    printf(event_name);
+    puts(event_name);
     logv ("AA_CH_NAVI: %s, TurnSide: %d, TurnEvent:%d, TurnNumber: %d, TurnAngle: %d", event_name, request.turn_side(), request.turn_event(), request.turn_number(), request.turn_angle());
     hex_dump("AA_CH_NAVI", 256, (unsigned char*)image.c_str(), image.length());
 }

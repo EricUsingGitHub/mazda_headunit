@@ -2,6 +2,8 @@
 ../common/audio.h
 ../common/command_server.cpp
 ../common/command_server.h
+../common/config.cpp
+../common/config.h
 ../common/glib_utils.cpp
 ../common/glib_utils.h
 ../common/json/json.hpp
@@ -27,6 +29,9 @@
 ../ubuntu/callbacks.h
 ../ubuntu/bt/ub_bluetooth.cpp
 ../ubuntu/bt/ub_bluetooth.h
+../ubuntu/callbacks.h
+../ubuntu/command_server_test.sh
+../ubuntu/headunit.json
 ../ubuntu/main.cpp
 ../ubuntu/main.h
 ../ubuntu/outputs.cpp

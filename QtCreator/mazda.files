@@ -2,6 +2,8 @@
 ../common/audio.h
 ../common/command_server.cpp
 ../common/command_server.h
+../common/config.cpp
+../common/config.h
 ../common/glib_utils.cpp
 ../common/glib_utils.h
 ../common/json/json.hpp
@@ -42,6 +44,8 @@
 ../mazda/gps/nematode/src/NMEACommand.cpp
 ../mazda/gps/nematode/src/NMEAParser.cpp
 ../mazda/gps/nematode/src/NumberConversion.cpp
+../mazda/headunit.json
+../mazda/hud-test.cpp
 ../mazda/main.cpp
 ../mazda/main.h
 ../mazda/nm/mzd_nightmode.cpp

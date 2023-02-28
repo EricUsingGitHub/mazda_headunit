@@ -120,6 +120,11 @@ void MazdaEventCallbacks::VideoFocusRequest(int chan, const HU::VideoFocusReques
     });
 }
 
+void MazdaEventCallbacks::CustomizeCarInfo(HU::ServiceDiscoveryResponse &carInfo)
+{
+    carInfo.set_driver_pos(config::rightHandDrive);
+}
+
 std::string MazdaEventCallbacks::GetCarBluetoothAddress()
 {
     return get_bluetooth_mac_address();
