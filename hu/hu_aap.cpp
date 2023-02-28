@@ -470,10 +470,10 @@
       inner->set_type(HU::STREAM_TYPE_VIDEO);
       auto videoConfig = inner->add_video_configs();
       videoConfig->set_resolution(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_RESOLUTION_800x480);
-      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_30);
+      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_25);
       videoConfig->set_margin_width(0);
       videoConfig->set_margin_height(0);
-      videoConfig->set_dpi(140);
+      videoConfig->set_dpi(120);
       inner->set_available_while_in_call(true);
 
       callbacks.CustomizeOutputChannel(AA_CH_VID, *inner);
@@ -552,10 +552,10 @@
       auto inner = navigationChannel->mutable_navigation_status_service();
 
       inner->set_minimum_interval_ms(1000);
-      //auto ImageOptions = inner->mutable_image_options();
-      //ImageOptions->set_width(100);
-      //ImageOptions->set_height(100);
-      //ImageOptions->set_colour_depth_bits(8);
+      /*auto ImageOptions = inner->mutable_image_options();
+      ImageOptions->set_width(100);
+      ImageOptions->set_height(100);
+      ImageOptions->set_colour_depth_bits(8);*/
       inner->set_type(HU::ChannelDescriptor::NavigationStatusService::IMAGE_CODES_ONLY);
     }
 

@@ -107,8 +107,8 @@ static void emit(int fd, int type, int code, int val)
   write(fd, &ie, sizeof(ie));
 }
 /**
-* Passes the keystroke to MZD by "ungrabbing" the kbd on key-down, simulating the same keystroke with uinput,
-* then "re-grabbing" the kbd on key-up.
+* Passes the keystroke to MZD by "ungrabbing" the keyboard on key-down, simulating the same keystroke with uinput,
+* then "re-grabbing" the keyboard on key-up.
 */
 void VideoOutput::pass_key_to_mzd(int type, int code, int val)
 {
@@ -238,7 +238,7 @@ void VideoOutput::input_thread_func()
                     bool longPress = false;
                     AudioManagerClient::FocusType audioFocus = callbacks->audioFocus;
                     bool hasMediaAudioFocus = audioFocus == AudioManagerClient::FocusType::PERMANENT;
-                    bool hasAudioFocus = audioFocus != AudioManagerClient::FocusType::NONE;
+                    bool hasAudioFocus = audioFocus != AudioManagerClient::FocusType::TRANSIENT;
 
                     //printf("Key code %i value %i\n", (int)event.code, (int)event.value);
                     switch (event.code)
@@ -253,7 +253,7 @@ void VideoOutput::input_thread_func()
                         scanCode = HUIB_MUSIC;
                         break;
                     case KEY_LEFTBRACE:
-                        printf("KEY_LEFTBRACE (next track with media focus: %i)\n",  hasMediaAudioFocus ? 1 : 0);
+                        printf("KEY_LEFTBRACE (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus);
                         if(hasMediaAudioFocus)
                         {
                             scanCode = HUIB_NEXT;
@@ -264,7 +264,7 @@ void VideoOutput::input_thread_func()
                         }
                         break;
                     case KEY_RIGHTBRACE:
-                        printf("KEY_RIGHTBRACE (prev track with media focus: %i)\n",  hasMediaAudioFocus ? 1 : 0);
+                        printf("KEY_RIGHTBRACE (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus);
                         if(hasMediaAudioFocus)
                         {
                             scanCode = HUIB_PREV;
@@ -322,8 +322,20 @@ void VideoOutput::input_thread_func()
                         printf("KEY_Z\n");
                         scanCode = HUIB_PHONE;
                         break;
+                    case KEY_T: // FAV
+                        printf("KEY_T (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus);
+                        if (hasMediaAudioFocus)
+              			{
+                            scanCode = HUIB_PLAYPAUSE;
+                   		}
+                        else
+                        {
+                       		scanCode = HUIB_PLAYPAUSE;
+                        }
+                        break;
                     case KEY_X: // CALL END
                         printf("KEY_X\n");
+                        scanCode = HUIB_CALLEND;
 #ifdef IOGRAB_DEBUG
                         if(hasMediaAudioFocus && isPressed && ioctl(kbd_fd, EVIOCGRAB, 0) < 0)
                         { // This is just for testing although it may be a useful feature if we polish it a little
@@ -334,10 +346,14 @@ void VideoOutput::input_thread_func()
                         {	// we can do this since this button does nothing when not on a call
                             scanCode = HUIB_CALLEND;
                         }
-                        break;
-                    case KEY_T: // FAV
-                        printf("KEY_T\n");
-                        scanCode = HUIB_PLAYPAUSE;
+                        if(!callbacks->inCall && isPressed)
+                        {
+                            callbacks->releaseAudioFocus();
+                        }
+                        else
+                        {
+                			callbacks->releaseAudioFocus();
+                  		}
                         break;
                     }
                     
@@ -351,19 +367,14 @@ void VideoOutput::input_thread_func()
                         time_t now = time(NULL);
                         if (now - pressedSince >= 2)
                         {
-                            if (pressScanCode == HUIB_PLAYPAUSE)
-                            {
-                                callbacks->releaseAudioFocus();
-                            }
-                            else if (pressScanCode == HUIB_BACK || pressScanCode == HUIB_CALLEND)
+                            if (pressScanCode == HUIB_BACK)
                             {
                                 callbacks->releaseVideoFocus();
                             }
-                            else if (pressScanCode == HUIB_HOME)
+                            else if (pressScanCode == HUIB_MUSIC)
                             {
-                                callbacks->takeVideoFocus();
+                                scanCode = HUIB_MUSIC;
                             }
-
                         }
                         pressScanCode = 0;
                     }
@@ -475,7 +486,7 @@ VideoOutput::VideoOutput(MazdaEventCallbacks* callbacks)
     input_thread_quit_pipe_write = quitpiperw[1];
 
     input_thread = std::thread([this](){ input_thread_func(); } );
-    //Drop caches before staing new video
+    //Drop caches before starting new video <<<maybe this causing usb pausing waze gps problem??
     sync();
     std::ofstream ofs("/proc/sys/vm/drop_caches");
     ofs << "3" << std::endl;
@@ -486,7 +497,7 @@ VideoOutput::VideoOutput(MazdaEventCallbacks* callbacks)
     #else
     "axis-left=0 axis-top=0 disp-width=800 disp-height=480"
     #endif
-    " max-lateness=1000000000 sync=false async=false";
+    " max-lateness=-1 sync=false async=false";
 
     GError* error = nullptr;
     vid_pipeline = gst_parse_launch(vid_pipeline_launch, &error);
